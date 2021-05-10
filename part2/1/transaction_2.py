@@ -2,8 +2,8 @@ import bitcoin.wallet
 from bitcoin.core import COIN, b2lx, serialize, x, lx, b2x
 from utils import *
 
-bitcoin.SelectParams("testnet") // Select the network (testnet or mainnet)
-my_private_key = bitcoin.wallet.CBitcoinSecret("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX") # Private key in WIF format XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+bitcoin.SelectParams("testnet") # Select the network (testnet or mainnet)
+my_private_key = bitcoin.wallet.CBitcoinSecret("92gpofwfthgN6risZNHK87Z7ynaTGXPgcVmgFNP22xEsFHJvHn9") # Private key in WIF format XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 my_public_key = my_private_key.pub
 my_address = bitcoin.wallet.P2PKHBitcoinAddress.from_pubkey(my_public_key)
 destination_address = bitcoin.wallet.CBitcoinAddress('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX') # Destination address (recipient of the money)
