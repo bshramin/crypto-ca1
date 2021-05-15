@@ -43,9 +43,9 @@ def send_from_P2PKH_transaction(amount_to_send, txid_to_spend, utxo_index,
 
 if __name__ == '__main__':
     ######################################################################
-    amount_to_send = 0.1
+    amount_to_send = 0.0001
     txid_to_spend = ('9ddf5565d0faa8d2040a8a8306f9dc6d67895985048153a37eff905a61b99d51') # TxHash of UTXO
-    utxo_index = 1 # UTXO index among transaction outputs
+    utxo_index = 0 # UTXO index among transaction outputs
     ######################################################################
 
     print(my_address) # Prints your address in base58
