@@ -31,12 +31,32 @@ def create_OP_CHECKSIG_signature(txin, txout, txin_scriptPubKey, seckey):
     return sig
 
 
+def create_OP_CHECKSIG_signature_multi_out(txin, txouts, txin_scriptPubKey, seckey):
+    tx = CMutableTransaction([txin], txouts)
+    sighash = SignatureHash(CScript(txin_scriptPubKey), tx,
+                            0, SIGHASH_ALL)
+    sig = seckey.sign(sighash) + bytes([SIGHASH_ALL])
+    return sig
+
+
 def create_signed_transaction(txin, txout, txin_scriptPubKey,
                               txin_scriptSig):
     tx = CMutableTransaction([txin], [txout])
     txin.scriptSig = CScript(txin_scriptSig)
     VerifyScript(txin.scriptSig, CScript(txin_scriptPubKey),
                  tx, 0, (SCRIPT_VERIFY_P2SH,))
+    return tx
+
+
+def create_signed_transaction_multi_out(
+    txin, txouts,
+    txin_scriptPubKey, txin_scriptSig
+):
+    tx = CMutableTransaction([txin], txouts)
+    txin.scriptSig = CScript(txin_scriptSig)
+    VerifyScript(
+        txin.scriptSig, CScript(txin_scriptPubKey), tx, 0, (SCRIPT_VERIFY_P2SH,)
+    )
     return tx
 
 

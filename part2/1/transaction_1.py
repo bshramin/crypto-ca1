@@ -1,3 +1,4 @@
+from bitcoin.core.script import OP_RETURN, OP_TRUE
 import bitcoin.wallet
 from bitcoin.core import COIN, b2lx, serialize, x, lx, b2x
 from utils import *
@@ -17,41 +18,60 @@ def P2PKH_scriptPubKey(address):
     return [OP_DUP, OP_HASH160, my_address, OP_EQUALVERIFY, OP_CHECKSIG]
 
 
+# to condition spending the outputs
+def P2PKH_scriptPubKey1(address):
+    ######################################################################
+    ## Fill out the operations for P2PKH scriptPubKey                   ##
+
+    return [OP_RETURN, "hi".encode()]
+
+
+# to condition spending the outputs
+def P2PKH_scriptPubKey2(address):
+    ######################################################################
+    ## Fill out the operations for P2PKH scriptPubKey                   ##
+
+    return [OP_TRUE]
+
+
 # to show that you own the inputs
-def P2PKH_scriptSig(txin, txout, txin_scriptPubKey):
+def P2PKH_scriptSig(txin, txouts, txin_scriptPubKey):
     ######################################################################
     ## Fill out the operations for P2PKH scriptSig                      ##
 
-    signature = create_OP_CHECKSIG_signature(txin, txout, txin_scriptPubKey, my_private_key)
+    signature = create_OP_CHECKSIG_signature_multi_out(txin, txouts, txin_scriptPubKey, my_private_key)
 
     return [signature, my_public_key]
 
 
-def send_from_P2PKH_transaction(amount_to_send, txid_to_spend, utxo_index,
-                                txout_scriptPubKey):
-    txout = create_txout(amount_to_send, txout_scriptPubKey)
+def send_from_P2PKH_transaction(amounts_to_send, txid_to_spend, utxo_index, txout_scriptPubKeys):
+    txouts=[]
+
+    for index, item in enumerate(amounts_to_send):
+        txouts.append(create_txout(item, txout_scriptPubKeys[index]))
 
     txin_scriptPubKey = P2PKH_scriptPubKey(my_address)
     txin = create_txin(txid_to_spend, utxo_index)
-    txin_scriptSig = P2PKH_scriptSig(txin, txout, txin_scriptPubKey)
+    txin_scriptSig = P2PKH_scriptSig(txin, txouts, txin_scriptPubKey)
 
-    new_tx = create_signed_transaction(txin, txout, txin_scriptPubKey,
+    new_tx = create_signed_transaction_multi_out(txin, txouts, txin_scriptPubKey,
                                        txin_scriptSig)
 
     return broadcast_transaction(new_tx)
 
 
 if __name__ == '__main__':
-    amount_to_send = 0.0001
-    txid_to_spend = ('9ddf5565d0faa8d2040a8a8306f9dc6d67895985048153a37eff905a61b99d51') # TxHash of UTXO
-    utxo_index = 0 # UTXO index among transaction outputs
+    amounts_to_send = [0.0001, 0.0005]
+    txout_scriptPubKeys = [P2PKH_scriptPubKey1(my_address), P2PKH_scriptPubKey2(my_address)]
+    txid_to_spend = ('8a2146202731e367555c1069be3937b2b75c3599382764050cebd0b28c00580d') # TxHash of UTXO
+    utxo_index = 1 # UTXO index among transaction outputs
     
     ######################################################################
 
     print(my_address) # Prints your address in base58
     print(my_public_key.hex()) # Print your public key in hex
     print(my_private_key.hex()) # Print your private key in hex
-    txout_scriptPubKey = P2PKH_scriptPubKey(my_address)
-    response = send_from_P2PKH_transaction(amount_to_send, txid_to_spend, utxo_index, txout_scriptPubKey)
+    
+    response = send_from_P2PKH_transaction(amounts_to_send, txid_to_spend, utxo_index, txout_scriptPubKeys)
     print(response.status_code, response.reason)
     print(response.text) # Report the hash of transaction which is printed in this section result
